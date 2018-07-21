@@ -1,0 +1,5 @@
+  {name}:
+    Description: Security Group {description}
+    Value: !GetAtt {name}.GroupId
+    Export:
+      Name: !Join [":", [!Ref "AWS::StackName", {name}]]

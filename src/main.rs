@@ -48,11 +48,12 @@ fn outputs_section(groups: &SecurityGroups) -> Vec<String> {
         .collect()
 }
 
-fn main() {
-    let groups = read_security_groups().expect("couldn't read the CSV file");
+fn main() -> Result<(), io::Error> {
+    let groups = read_security_groups()?;
     println!(
         include_str!("main.tmpl"),
         resources = resources_section(&groups).join("\n"),
         outputs = outputs_section(&groups).join("\n")
     );
+    Ok(())
 }

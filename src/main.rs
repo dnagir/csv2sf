@@ -9,7 +9,9 @@ struct SecurityGroup {
     description: String,
 }
 
-fn read_security_groups() -> Result<Vec<SecurityGroup>, io::Error> {
+type SecurityGroups = Vec<SecurityGroup>;
+
+fn read_security_groups() -> Result<SecurityGroups, io::Error> {
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(false)
         .from_reader(io::stdin());
@@ -20,9 +22,8 @@ fn read_security_groups() -> Result<Vec<SecurityGroup>, io::Error> {
     Ok(groups)
 }
 
-fn main() {
-    let groups = read_security_groups().expect("couldn't read the CSV file");
-    let resources: Vec<String> = groups
+fn resources_section(groups: &SecurityGroups) -> Vec<String> {
+    groups
         .iter()
         .map(|sg| {
             format!(
@@ -31,8 +32,11 @@ fn main() {
                 description = sg.description
             )
         })
-        .collect();
-    let outputs: Vec<String> = groups
+        .collect()
+}
+
+fn outputs_section(groups: &SecurityGroups) -> Vec<String> {
+    groups
         .iter()
         .map(|sg| {
             format!(
@@ -41,11 +45,14 @@ fn main() {
                 description = sg.description
             )
         })
-        .collect();
+        .collect()
+}
 
+fn main() {
+    let groups = read_security_groups().expect("couldn't read the CSV file");
     println!(
         include_str!("main.tmpl"),
-        resources = resources.join("\n"),
-        outputs = outputs.join("\n")
+        resources = resources_section(&groups).join("\n"),
+        outputs = outputs_section(&groups).join("\n")
     );
 }

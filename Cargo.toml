@@ -1,0 +1,6 @@
+[package]
+name = "csv2cf"
+version = "0.1.0"
+authors = ["Dmytrii Nagirniak <dnagir@gmail.com>"]
+
+[dependencies]

@@ -4,3 +4,4 @@ version = "0.1.0"
 authors = ["Dmytrii Nagirniak <dnagir@gmail.com>"]
 
 [dependencies]
+csv = "1"

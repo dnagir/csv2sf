@@ -1,7 +1,9 @@
-use std::io;
 extern crate csv;
 #[macro_use]
 extern crate serde_derive;
+extern crate itertools;
+use std::io;
+use itertools::Itertools;
 
 #[derive(Deserialize)]
 struct SecurityGroup {
@@ -22,37 +24,31 @@ fn read_security_groups() -> Result<SecurityGroups, io::Error> {
     Ok(groups)
 }
 
-fn resources_section(groups: &SecurityGroups) -> Vec<String> {
-    groups
-        .iter()
-        .map(|sg| {
-            format!(
-                include_str!("sg.tmpl"),
-                name = sg.name,
-                description = sg.description
-            )
-        })
-        .collect()
+fn resources_section<'a>(groups: &'a SecurityGroups) -> impl Iterator<Item = String> + 'a {
+    groups.iter().map(|sg| {
+        format!(
+            include_str!("sg.tmpl"),
+            name = sg.name,
+            description = sg.description
+        )
+    })
 }
 
-fn outputs_section(groups: &SecurityGroups) -> Vec<String> {
-    groups
-        .iter()
-        .map(|sg| {
-            format!(
-                include_str!("sg-out.tmpl"),
-                name = sg.name,
-                description = sg.description
-            )
-        })
-        .collect()
+fn outputs_section<'a>(groups: &'a SecurityGroups) -> impl Iterator<Item = String> + 'a {
+    groups.iter().map(|sg| {
+        format!(
+            include_str!("sg-out.tmpl"),
+            name = sg.name,
+            description = sg.description
+        )
+    })
 }
 
 fn main() -> Result<(), io::Error> {
     let groups = read_security_groups()?;
     println!(
         include_str!("main.tmpl"),
-        resources = resources_section(&groups).join("\n"),
+        resources = resources_section(&groups).format("\n"),
         outputs = outputs_section(&groups).join("\n")
     );
     Ok(())
